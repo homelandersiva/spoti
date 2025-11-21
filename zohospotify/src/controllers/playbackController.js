@@ -121,119 +121,159 @@ async function queue(req, res) {
 async function resume(req, res) {
   const { userId } = req.body;
   if (!requireUserId(userId, res)) return;
+  
+  console.log('🔄 RESUME DEBUGGING START');
+  console.log('📍 User ID:', userId);
+  
   try {
-    // First check if user has any available devices
-    const devicesResponse = await spotifyRequest(userId, 'get', '/me/player/devices');
-    const devices = devicesResponse.devices || [];
-    
-    if (devices.length === 0) {
-      return res.status(400).json({
-        error: 'Unable to resume playback.',
-        details: 'No active devices found. Please open Spotify on a device first.',
-        solution: 'Open Spotify on your phone, computer, or other device, then try again.'
-      });
-    }
-
-    // Get current playback state to find what to resume
+    // Step 1: Get current playback state to find what to resume
+    console.log('📡 Step 1: Getting current playback state...');
     let currentPlayback;
+    
     try {
       currentPlayback = await spotifyRequest(userId, 'get', '/me/player');
+      console.log('✅ Current playback response received');
+      console.log('📊 Playback data:', JSON.stringify(currentPlayback, null, 2));
     } catch (playbackError) {
-      // If we can't get current playback, try simple resume
-      console.log('⚠️ Could not get current playback state, trying simple resume');
-    }
-
-    // Check if there's an active device
-    const activeDevice = devices.find(device => device.is_active);
-    let targetDeviceId = activeDevice ? activeDevice.id : devices[0].id;
-    
-    // Prepare resume payload based on current playback state
-    let resumePayload = {};
-    
-    if (currentPlayback && currentPlayback.item) {
-      const currentTrack = currentPlayback.item;
-      const progressMs = currentPlayback.progress_ms || 0;
-      
-      console.log(`🔄 Resuming track: ${currentTrack.name} by ${currentTrack.artists[0].name} at ${Math.round(progressMs/1000)}s`);
-      
-      // Resume with specific track and position
-      resumePayload = {
-        uris: [currentTrack.uri],
-        position_ms: progressMs
-      };
-      
-      if (!activeDevice) {
-        // If no active device, specify device and start playback
-        resumePayload.device_id = targetDeviceId;
-      }
-    } else {
-      console.log('🔄 No current track found, attempting simple resume');
-      // Fallback to simple resume without specific track
-      if (!activeDevice) {
-        // Transfer playback to first available device
-        await spotifyRequest(userId, 'put', '/me/player', {
-          device_ids: [targetDeviceId],
-          play: true
-        });
-        return successResponse(res, 'resume', { 
-          message: `Transferred playback to ${devices[0].name} and resumed`,
-          device: devices[0].name 
-        });
-      }
-    }
-
-    // Execute the resume request
-    if (!activeDevice && resumePayload.uris) {
-      // Transfer and play specific track
-      await spotifyRequest(userId, 'put', '/me/player', {
-        device_ids: [targetDeviceId]
+      console.error('❌ Failed to get current playback state');
+      console.error('🔍 Playback error details:', playbackError.message);
+      return res.status(400).json({
+        error: 'Unable to resume playback.',
+        details: 'Could not get current playback state: ' + playbackError.message,
+        solution: 'Please ensure Spotify is open and playing/paused on a device.'
       });
-      // Small delay to ensure device transfer completes
-      await new Promise(resolve => setTimeout(resolve, 500));
     }
+
+    // Step 2: Validate playback data
+    console.log('📡 Step 2: Validating playback data...');
     
-    await spotifyRequest(userId, 'put', '/me/player/play', resumePayload);
+    if (!currentPlayback) {
+      console.log('❌ No playback data received');
+      return res.status(400).json({
+        error: 'Unable to resume playback.',
+        details: 'No current playback information available.',
+        solution: 'Please start playing a song first, then try to resume.'
+      });
+    }
+
+    if (!currentPlayback.item) {
+      console.log('❌ No track item in playback data');
+      console.log('📊 Available playback keys:', Object.keys(currentPlayback));
+      return res.status(400).json({
+        error: 'Unable to resume playback.',
+        details: 'No track information found in current playback.',
+        solution: 'Please start playing a song first, then try to resume.'
+      });
+    }
+
+    // Step 3: Extract track information
+    console.log('📡 Step 3: Extracting track information...');
+    const currentTrack = currentPlayback.item;
+    const progressMs = currentPlayback.progress_ms || 0;
+    const isPlaying = currentPlayback.is_playing || false;
     
-    const responseData = { 
-      action: 'resume',
-      status: 'ok'
+    console.log('🎵 Track details:');
+    console.log('   - Name:', currentTrack.name);
+    console.log('   - Artist:', currentTrack.artists[0]?.name);
+    console.log('   - URI:', currentTrack.uri);
+    console.log('   - Progress:', progressMs, 'ms (', Math.round(progressMs/1000), 's)');
+    console.log('   - Is Playing:', isPlaying);
+    
+    if (isPlaying) {
+      console.log('ℹ️  Track is already playing, no need to resume');
+      return res.json({
+        status: 'ok',
+        action: 'resume',
+        message: 'Track is already playing',
+        track: {
+          name: currentTrack.name,
+          artist: currentTrack.artists[0]?.name,
+          uri: currentTrack.uri,
+          position_ms: progressMs,
+          is_playing: true
+        }
+      });
+    }
+
+    // Step 4: Prepare resume payload
+    console.log('📡 Step 4: Preparing resume payload...');
+    const resumePayload = {
+      uris: [currentTrack.uri],
+      position_ms: progressMs
     };
     
-    if (currentPlayback && currentPlayback.item) {
-      responseData.track = {
-        name: currentPlayback.item.name,
-        artist: currentPlayback.item.artists[0].name,
-        uri: currentPlayback.item.uri,
-        position_ms: currentPlayback.progress_ms
-      };
+    console.log('📦 Resume payload:', JSON.stringify(resumePayload, null, 2));
+    
+    // Step 5: Execute resume request
+    console.log('📡 Step 5: Executing resume request...');
+    try {
+      await spotifyRequest(userId, 'put', '/me/player/play', resumePayload);
+      console.log('✅ Resume request successful');
+    } catch (resumeError) {
+      console.error('❌ Resume request failed');
+      console.error('🔍 Resume error details:', resumeError.message);
+      throw resumeError; // Re-throw to be caught by main catch block
     }
     
-    if (!activeDevice) {
-      responseData.message = `Transferred playback to ${devices[0].name} and resumed`;
-      responseData.device = devices[0].name;
-    }
+    // Step 6: Return success response
+    console.log('📡 Step 6: Returning success response...');
+    const responseData = {
+      status: 'ok',
+      action: 'resume',
+      track: {
+        name: currentTrack.name,
+        artist: currentTrack.artists[0]?.name,
+        uri: currentTrack.uri,
+        position_ms: progressMs,
+        resumed_at: new Date().toISOString()
+      }
+    };
+    
+    console.log('📊 Final response:', JSON.stringify(responseData, null, 2));
+    console.log('🔄 RESUME DEBUGGING END - SUCCESS');
     
     res.json(responseData);
     
   } catch (error) {
+    console.error('❌ RESUME DEBUGGING END - ERROR');
+    console.error('🔍 Final error details:', error.message);
+    console.error('🔍 Full error:', error);
+    
     // Handle specific Spotify errors
     if (error.message && error.message.includes('NO_ACTIVE_DEVICE')) {
       return res.status(404).json({
         error: 'Unable to resume playback.',
         details: 'No active device found.',
-        solution: 'Please open Spotify on a device and start playing something first.'
+        solution: 'Please open Spotify on a device and start playing something first.',
+        debug: {
+          userId: userId,
+          errorType: 'NO_ACTIVE_DEVICE'
+        }
       });
     }
     
-    if (error.message && error.message.includes('UNKNOWN')) {
-      return res.status(400).json({
+    if (error.message && error.message.includes('PREMIUM_REQUIRED')) {
+      return res.status(403).json({
         error: 'Unable to resume playback.',
-        details: 'No previous playback context found.',
-        solution: 'Please start playing a song first, then you can pause and resume it.'
+        details: 'Spotify Premium subscription is required.',
+        solution: 'Please upgrade to Spotify Premium to use playback controls.',
+        debug: {
+          userId: userId,
+          errorType: 'PREMIUM_REQUIRED'
+        }
       });
     }
     
-    handleSpotifyError(error, res, 'resume playback');
+    // Generic error response with debug info
+    res.status(500).json({
+      error: 'Unable to resume playback.',
+      details: error.message,
+      debug: {
+        userId: userId,
+        errorType: 'UNKNOWN',
+        timestamp: new Date().toISOString()
+      }
+    });
   }
 }
 
