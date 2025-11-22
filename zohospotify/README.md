@@ -7,12 +7,14 @@ Production-ready Node.js + Express backend that lets a Zoho Cliq bot control a u
 **Spotify Premium subscription is required** for playback control functionality (play, pause, next, previous, volume, seek, queue). This is a Spotify API limitation, not a limitation of this application.
 
 ### What Works Without Premium:
+
 - ✅ User authentication and authorization
 - ✅ Reading current playback state (`/spotify/current`)
 - ✅ Accessing user's playlists and library
 - ✅ Reading recently played tracks
 
 ### What Requires Premium:
+
 - ❌ Play/pause controls
 - ❌ Skip to next/previous track
 - ❌ Volume control
@@ -100,21 +102,23 @@ user-read-email
 
 > ⚠️ **Endpoints marked with 🔒 require Spotify Premium**
 
-| Method | Endpoint | Body / Query | Description |
-|--------|----------|--------------|-------------|
-| GET | `/health` | — | Health probe |
-| GET | `/login` | — | Redirect to Spotify authorization screen |
-| GET | `/callback` | `code`, `state` | Spotify redirect handler, stores refresh token |
-| POST | `/spotify/play` 🔒 | `{ userId, trackUri }` | Play a specific track URI *(Premium required)* |
-| POST | `/spotify/pause` 🔒 | `{ userId }` | Pause playback *(Premium required)* |
-| POST | `/spotify/resume` 🔒 | `{ userId }` | Resume current track from last position *(Premium required)* |
-| POST | `/spotify/next` 🔒 | `{ userId }` | Next track *(Premium required)* |
-| POST | `/spotify/previous` 🔒 | `{ userId }` | Previous track *(Premium required)* |
-| POST | `/spotify/volume` 🔒 | `{ userId, volume_percent }` | Set device volume 0-100 *(Premium required)* |
-| POST | `/spotify/seek` 🔒 | `{ userId, position_ms }` | Seek within the current track *(Premium required)* |
-| POST | `/spotify/queue` 🔒 | `{ userId, trackUri }` | Add a track to the queue *(Premium required)* |
-| GET | `/spotify/current?userId=XYZ` | `userId` query | Return current playback metadata *(Works with free accounts)* |
-| GET | `/spotify/devices?userId=XYZ` | `userId` query | Get user's available Spotify devices *(Works with free accounts)* |
+| Method | Endpoint                      | Body / Query                 | Description                                                                           |
+| ------ | ----------------------------- | ---------------------------- | ------------------------------------------------------------------------------------- |
+| GET    | `/health`                     | —                            | Health probe                                                                          |
+| GET    | `/login`                      | —                            | Redirect to Spotify authorization screen                                              |
+| GET    | `/callback`                   | `code`, `state`              | Spotify redirect handler, stores refresh token, returns HTML success page with userId |
+| GET    | `/users`                      | —                            | Returns JSON list of all authorized userIds and last updated timestamps               |
+| POST   | `/spotify/play` 🔒            | `{ userId, trackUri }`       | Play a specific track URI _(Premium required)_                                        |
+| POST   | `/spotify/pause` 🔒           | `{ userId }`                 | Pause playback _(Premium required)_                                                   |
+| POST   | `/spotify/resume` 🔒          | `{ userId }`                 | Resume current track from last position _(Premium required)_                          |
+| POST   | `/spotify/next` 🔒            | `{ userId }`                 | Next track _(Premium required)_                                                       |
+| POST   | `/spotify/previous` 🔒        | `{ userId }`                 | Previous track _(Premium required)_                                                   |
+| POST   | `/spotify/volume` 🔒          | `{ userId, volume_percent }` | Set device volume 0-100 _(Premium required)_                                          |
+| POST   | `/spotify/seek` 🔒            | `{ userId, position_ms }`    | Seek within the current track _(Premium required)_                                    |
+| POST   | `/spotify/queue` 🔒           | `{ userId, trackUri }`       | Add a track to the queue _(Premium required)_                                         |
+| GET    | `/spotify/current?userId=XYZ` | `userId` query               | Return current playback metadata _(Works with free accounts)_                         |
+| GET    | `/spotify/devices?userId=XYZ` | `userId` query               | Get user's available Spotify devices _(Works with free accounts)_                     |
+| GET    | `/spotify/me?userId=XYZ` 🔒   | `userId` query               | Get Spotify user profile (userId, displayName, email, country, product)               |
 
 > ⚠️ Include the `x-bot-secret: <BOT_SHARED_SECRET>` header for every `/spotify/*` route when `BOT_SHARED_SECRET` is configured.
 
@@ -181,6 +185,9 @@ curl "http://localhost:3000/spotify/current?userId=USER_ID" \
 # 11. Get available devices
 curl "http://localhost:3000/spotify/devices?userId=USER_ID" \
   -H "x-bot-secret: BOT_SECRET"
+
+# 12. Get all authorized users (no auth required)
+curl http://localhost:3000/users
 ```
 
 ## Postman Collection
@@ -253,7 +260,8 @@ A richer example with POST actions via CLIQ bot:
 
 **Error message:** `No active device found` or `No active devices found`
 
-**Solution:** 
+**Solution:**
+
 - Open Spotify on your phone, computer, or other device
 - Start playing any song to activate the device
 - The resume endpoint will now automatically detect and use available devices
@@ -263,7 +271,8 @@ A richer example with POST actions via CLIQ bot:
 
 **Error message:** `No previous playback context found`
 
-**Solution:** 
+**Solution:**
+
 - This happens when there's nothing to resume (no previous playback)
 - Start playing a song first using the `/spotify/play` endpoint
 - Then you can pause and resume it
@@ -272,12 +281,14 @@ A richer example with POST actions via CLIQ bot:
 ### How Resume Works
 
 The enhanced resume endpoint:
+
 1. **Gets current playback state** to identify the track that was playing
 2. **Resumes the specific track** with the exact position where it was paused
 3. **Handles device transfer** if no device is currently active
 4. **Returns track information** including name, artist, and resume position
 
 **Example resume response:**
+
 ```json
 {
   "status": "ok",
@@ -296,11 +307,13 @@ The enhanced resume endpoint:
 **Error message:** `State mismatch. Please restart the login process.`
 
 **Common causes:**
+
 - Cookies are blocked or expired
 - Browser security settings preventing cookie storage
 - HTTP vs HTTPS configuration mismatch
 
-**Solution:** 
+**Solution:**
+
 - Clear browser cookies for localhost
 - Ensure consistent HTTP/HTTPS usage
 - Check browser console for cookie-related errors
@@ -309,7 +322,8 @@ The enhanced resume endpoint:
 
 **Error message:** `Illegal redirect_uri`
 
-**Solution:** 
+**Solution:**
+
 - Ensure `SPOTIFY_REDIRECT_URI` in `.env` matches exactly what's configured in your Spotify app settings
 - Include the full URL including protocol (`http://` or `https://`)
 - Verify no trailing slashes or extra characters
