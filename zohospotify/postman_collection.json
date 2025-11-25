@@ -5,7 +5,7 @@
     "description": "Control Spotify playback through the Zoho backend."
   },
   "variable": [
-    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "baseUrl", "value": "http://203.57.85.77:3000" },
     { "key": "botSecret", "value": "BOT_SHARED_SECRET" },
     { "key": "userId", "value": "YOUR_SPOTIFY_USER_ID" },
     { "key": "trackUri", "value": "spotify:track:4cOdK2wGLETKBW3PvgPWqT" }
