@@ -5,24 +5,52 @@
     "description": "Control Spotify playback through the Zoho backend."
   },
   "variable": [
-    { "key": "baseUrl", "value": "http://203.57.85.77:3000" },
-    { "key": "botSecret", "value": "BOT_SHARED_SECRET" },
-    { "key": "userId", "value": "YOUR_SPOTIFY_USER_ID" },
-    { "key": "trackUri", "value": "spotify:track:4cOdK2wGLETKBW3PvgPWqT" }
+    {
+      "key": "baseUrl",
+      "value": "https://medinventory.me"
+    },
+    {
+      "key": "botSecret",
+      "value": "BOT_SHARED_SECRET"
+    },
+    {
+      "key": "userId",
+      "value": "YOUR_SPOTIFY_USER_ID"
+    },
+    {
+      "key": "trackUri",
+      "value": "spotify:track:4cOdK2wGLETKBW3PvgPWqT"
+    }
   ],
   "item": [
     {
       "name": "Health",
       "request": {
         "method": "GET",
-        "url": { "raw": "{{baseUrl}}/health", "host": ["{{baseUrl}}"], "path": ["health"] }
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "health"
+          ]
+        }
       }
     },
     {
       "name": "Login",
       "request": {
         "method": "GET",
-        "url": { "raw": "{{baseUrl}}/login", "host": ["{{baseUrl}}"], "path": ["login"] }
+        "url": {
+          "raw": "{{baseUrl}}/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "login"
+          ]
+        }
       }
     },
     {
@@ -30,14 +58,29 @@
       "request": {
         "method": "POST",
         "header": [
-          { "key": "Content-Type", "value": "application/json" },
-          { "key": "x-bot-secret", "value": "{{botSecret}}" }
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "x-bot-secret",
+            "value": "{{botSecret}}"
+          }
         ],
         "body": {
           "mode": "raw",
           "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"trackUri\": \"{{trackUri}}\"\n}"
         },
-        "url": { "raw": "{{baseUrl}}/spotify/play", "host": ["{{baseUrl}}"], "path": ["spotify", "play"] }
+        "url": {
+          "raw": "{{baseUrl}}/spotify/play",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "spotify",
+            "play"
+          ]
+        }
       }
     },
     {
@@ -45,11 +88,29 @@
       "request": {
         "method": "POST",
         "header": [
-          { "key": "Content-Type", "value": "application/json" },
-          { "key": "x-bot-secret", "value": "{{botSecret}}" }
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "x-bot-secret",
+            "value": "{{botSecret}}"
+          }
         ],
-        "body": { "mode": "raw", "raw": "{\n  \"userId\": \"{{userId}}\"\n}" },
-        "url": { "raw": "{{baseUrl}}/spotify/pause", "host": ["{{baseUrl}}"], "path": ["spotify", "pause"] }
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userId\": \"{{userId}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/spotify/pause",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "spotify",
+            "pause"
+          ]
+        }
       }
     },
     {
@@ -57,11 +118,29 @@
       "request": {
         "method": "POST",
         "header": [
-          { "key": "Content-Type", "value": "application/json" },
-          { "key": "x-bot-secret", "value": "{{botSecret}}" }
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "x-bot-secret",
+            "value": "{{botSecret}}"
+          }
         ],
-        "body": { "mode": "raw", "raw": "{\n  \"userId\": \"{{userId}}\"\n}" },
-        "url": { "raw": "{{baseUrl}}/spotify/next", "host": ["{{baseUrl}}"], "path": ["spotify", "next"] }
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userId\": \"{{userId}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/spotify/next",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "spotify",
+            "next"
+          ]
+        }
       }
     },
     {
@@ -69,11 +148,29 @@
       "request": {
         "method": "POST",
         "header": [
-          { "key": "Content-Type", "value": "application/json" },
-          { "key": "x-bot-secret", "value": "{{botSecret}}" }
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "x-bot-secret",
+            "value": "{{botSecret}}"
+          }
         ],
-        "body": { "mode": "raw", "raw": "{\n  \"userId\": \"{{userId}}\"\n}" },
-        "url": { "raw": "{{baseUrl}}/spotify/previous", "host": ["{{baseUrl}}"], "path": ["spotify", "previous"] }
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userId\": \"{{userId}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/spotify/previous",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "spotify",
+            "previous"
+          ]
+        }
       }
     },
     {
@@ -81,14 +178,29 @@
       "request": {
         "method": "POST",
         "header": [
-          { "key": "Content-Type", "value": "application/json" },
-          { "key": "x-bot-secret", "value": "{{botSecret}}" }
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "x-bot-secret",
+            "value": "{{botSecret}}"
+          }
         ],
         "body": {
           "mode": "raw",
           "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"volume_percent\": 65\n}"
         },
-        "url": { "raw": "{{baseUrl}}/spotify/volume", "host": ["{{baseUrl}}"], "path": ["spotify", "volume"] }
+        "url": {
+          "raw": "{{baseUrl}}/spotify/volume",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "spotify",
+            "volume"
+          ]
+        }
       }
     },
     {
@@ -96,14 +208,29 @@
       "request": {
         "method": "POST",
         "header": [
-          { "key": "Content-Type", "value": "application/json" },
-          { "key": "x-bot-secret", "value": "{{botSecret}}" }
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "x-bot-secret",
+            "value": "{{botSecret}}"
+          }
         ],
         "body": {
           "mode": "raw",
           "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"position_ms\": 90000\n}"
         },
-        "url": { "raw": "{{baseUrl}}/spotify/seek", "host": ["{{baseUrl}}"], "path": ["spotify", "seek"] }
+        "url": {
+          "raw": "{{baseUrl}}/spotify/seek",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "spotify",
+            "seek"
+          ]
+        }
       }
     },
     {
@@ -111,14 +238,29 @@
       "request": {
         "method": "POST",
         "header": [
-          { "key": "Content-Type", "value": "application/json" },
-          { "key": "x-bot-secret", "value": "{{botSecret}}" }
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "x-bot-secret",
+            "value": "{{botSecret}}"
+          }
         ],
         "body": {
           "mode": "raw",
           "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"trackUri\": \"{{trackUri}}\"\n}"
         },
-        "url": { "raw": "{{baseUrl}}/spotify/queue", "host": ["{{baseUrl}}"], "path": ["spotify", "queue"] }
+        "url": {
+          "raw": "{{baseUrl}}/spotify/queue",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "spotify",
+            "queue"
+          ]
+        }
       }
     },
     {
@@ -126,14 +268,25 @@
       "request": {
         "method": "GET",
         "header": [
-          { "key": "x-bot-secret", "value": "{{botSecret}}" }
+          {
+            "key": "x-bot-secret",
+            "value": "{{botSecret}}"
+          }
         ],
         "url": {
           "raw": "{{baseUrl}}/spotify/current?userId={{userId}}",
-          "host": ["{{baseUrl}}"],
-          "path": ["spotify", "current"],
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "spotify",
+            "current"
+          ],
           "query": [
-            { "key": "userId", "value": "{{userId}}" }
+            {
+              "key": "userId",
+              "value": "{{userId}}"
+            }
           ]
         }
       }

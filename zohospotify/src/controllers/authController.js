@@ -182,7 +182,7 @@ async function callback(req, res) {
       }
     }
 
-    const baseUrl = process.env.BASE_URL || "http://203.57.85.77:3000";
+    const baseUrl = process.env.BASE_URL || "https://medinventory.me";
     const successHtml = `<!doctype html>
 <html>
   <head>
