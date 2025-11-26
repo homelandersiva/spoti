@@ -1,4 +1,9 @@
+.gitignore
+
 node_modules/
- 
+.env
 npm-debug.log*
 .DS_Store
+
+# Sensitive token storage
+data/refreshTokens.json

@@ -15,6 +15,7 @@ router.get("/callback", authController.callback);
 router.get("/users", authController.getUserIds);
 
 router.use("/spotify", botAuth);
+router.post("/spotify/logout", authController.logout);
 router.post("/spotify/connect", authController.connect);
 router.post("/spotify/play", playbackController.play);
 router.post("/spotify/pause", playbackController.pause);

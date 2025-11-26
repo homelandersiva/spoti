@@ -1,0 +1,6 @@
+{
+  "example_spotify_user_id": {
+    "refreshToken": "EXAMPLE_REFRESH_TOKEN_WILL_BE_GENERATED_AFTER_LOGIN",
+    "updatedAt": "2025-11-26T00:00:00.000Z"
+  }
+}

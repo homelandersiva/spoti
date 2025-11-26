@@ -1,6 +1,10 @@
 const axios = require("axios");
 const crypto = require("crypto");
-const { saveRefreshToken, getRefreshToken } = require("../tokenStore");
+const {
+  saveRefreshToken,
+  getRefreshToken,
+  removeRefreshToken,
+} = require("../tokenStore");
 
 const AUTH_STATE_COOKIE = "spotify_auth_state";
 const AUTH_SCOPES = [
@@ -278,9 +282,49 @@ async function connect(req, res) {
   }
 }
 
+async function logout(req, res) {
+  const { userId } = req.body;
+
+  if (!userId) {
+    return res
+      .status(400)
+      .json({ error: "userId is required in request body." });
+  }
+
+  try {
+    const tokenStore = await require("fs").promises.readFile(
+      require("path").join(__dirname, "../../data/refreshTokens.json"),
+      "utf-8"
+    );
+    const tokens = JSON.parse(tokenStore);
+
+    if (!tokens[userId]) {
+      return res.status(404).json({
+        error: "User not found",
+        message: "User ID not found in token store or already logged out.",
+      });
+    }
+
+    await removeRefreshToken(userId);
+    console.log("🗑️ User logged out:", userId);
+
+    res.json({
+      success: true,
+      message: `User ${userId} has been logged out and tokens removed.`,
+    });
+  } catch (error) {
+    console.error("Error during logout:", error.message);
+    res.status(500).json({
+      error: "Failed to logout user.",
+      details: error.message,
+    });
+  }
+}
+
 module.exports = {
   login,
   callback,
   getUserIds,
   connect,
+  logout,
 };

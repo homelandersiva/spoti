@@ -82,7 +82,7 @@ user-read-email
 
 ```
 /project-root
-  ├── data/refreshTokens.json        # simple JSON token store
+  ├── data/refreshTokens.json        # simple JSON token store (NEVER commit this file!)
   ├── src
   │   ├── app.js                     # Express bootstrap
   │   ├── routes.js                  # All HTTP routes
@@ -108,6 +108,7 @@ user-read-email
 | GET    | `/login`                      | —                            | Redirect to Spotify authorization screen                                              |
 | GET    | `/callback`                   | `code`, `state`              | Spotify redirect handler, stores refresh token, returns HTML success page with userId |
 | GET    | `/users`                      | —                            | Returns JSON list of all authorized userIds and last updated timestamps               |
+| POST   | `/spotify/logout`             | `{ userId }`                 | Remove user's refresh token and revoke backend access _(Auth required)_               |
 | POST   | `/spotify/play` 🔒            | `{ userId, trackUri }`       | Play a specific track URI _(Premium required)_                                        |
 | POST   | `/spotify/pause` 🔒           | `{ userId }`                 | Pause playback _(Premium required)_                                                   |
 | POST   | `/spotify/resume` 🔒          | `{ userId }`                 | Resume current track from last position _(Premium required)_                          |
@@ -188,6 +189,12 @@ curl "http://localhost:3000/spotify/devices?userId=USER_ID" \
 
 # 12. Get all authorized users (no auth required)
 curl http://localhost:3000/users
+
+# 13. Logout user (remove refresh token)
+curl -X POST http://localhost:3000/spotify/logout \
+  -H "Content-Type: application/json" \
+  -H "x-bot-secret: BOT_SECRET" \
+  -d '{"userId":"USER_ID"}'
 ```
 
 ## Postman Collection
@@ -335,7 +342,3 @@ The enhanced resume endpoint:
 - ✅ Set `BOT_SHARED_SECRET` for Zoho -> backend authentication
 - ✅ Configure your public `BASE_URL` as the Spotify app redirect URI
 - ✅ Persist `data/refreshTokens.json` (or plug in Redis/DB) in production
-
-## Need the Zoho Cliq handler too?
-
-Say the word: **“Generate the matching Zoho Cliq message handler code too.”**
