@@ -36,8 +36,23 @@ async function play(req, res) {
     return res.status(400).json({ error: 'trackUri is required to start playback.' });
   }
   try {
-    await spotifyRequest(userId, 'put', '/me/player/play', { uris: [trackUri] });
-    successResponse(res, 'play', { trackUri });
+    // Step 1: Get track info to extract album URI
+    const trackId = trackUri.split(':').pop();
+    const trackInfo = await spotifyRequest(userId, 'get', `/tracks/${trackId}`);
+    
+    const albumUri = trackInfo.album.uri;
+    
+    // Step 2: Play using album context (enables next/previous to work properly)
+    await spotifyRequest(userId, 'put', '/me/player/play', {
+      context_uri: albumUri,
+      offset: { uri: trackUri }
+    });
+    
+    successResponse(res, 'play', { 
+      trackUri,
+      context_uri: albumUri,
+      message: 'Track playing inside album context.'
+    });
   } catch (error) {
     handleSpotifyError(error, res, 'start playback');
   }
